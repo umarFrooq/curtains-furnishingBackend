@@ -36,13 +36,12 @@
 #             npm install
 #             pm2 restart backend || pm2 start index.js --name backend
 
-
 name: Deploy Backend to Azure VM
 
 on:
   push:
     branches:
-      - main  # or your deployment branch
+      - main
 
 jobs:
   deploy:
@@ -52,15 +51,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Deploy files to VM
+        uses: appleboy/scp-action@v0.1.4
         with:
-          node-version: 18
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: "~/curtains-furnishingBackend"
+          strip_components: 1  # ensures files aren't nested
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Deploy to Azure VM via SSH
+      - name: Restart backend on VM
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
@@ -68,6 +69,5 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ~/curtains-furnishingBackend
-            git pull origin main
             npm install
-            pm2 restart backend || pm2 start index.js --name backend
+            pm2 restart backend || pm2 start server.js --name backend
