@@ -48,7 +48,7 @@ if (process.env.NODE_ENV === 'production' && allowedOrigins.length > 0) {
 
 // Basic route
 app.get('/', (req, res) => {
-  res.send('APi is runingsdd');
+  res.send('APi is runings');
 });
 
 // Mount routers
